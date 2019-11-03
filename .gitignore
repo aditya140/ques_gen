@@ -1,0 +1,14 @@
+
+.data/multi30k/test2016.en
+.data/multi30k/test2016.de
+.data/multi30k/test2016.en
+.data/multi30k/test2016.fr
+.data/multi30k/train.de
+.data/multi30k/train.en
+.data/multi30k/training.tar.gz
+.data/multi30k/val.de
+.data/multi30k/val.en
+.data/multi30k/validation.tar.gz
+.data/train.csv
+.data/train.csv
+.data/val.csv
