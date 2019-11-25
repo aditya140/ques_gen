@@ -1,0 +1,4 @@
+torch==1.15.4
+spacy==2.2.3
+torchtext==0.4.0
+tensorboardX==1.9
