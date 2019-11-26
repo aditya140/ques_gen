@@ -1,3 +1,5 @@
+[![CircleCI](https://circleci.com/gh/aditya140/ques_gen/tree/master.svg?style=svg)](https://circleci.com/gh/aditya140/ques_gen/tree/master)
+
 # ques_gen
 NLP Project 1
 
