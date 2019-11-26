@@ -49,6 +49,3 @@ jobs:
       # https://pytest.org
       # https://nose.readthedocs.io
 
-      - store_artifacts:
-          path: runs
-          destination: runs
