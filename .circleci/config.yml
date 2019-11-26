@@ -29,6 +29,7 @@ jobs:
       - run:
           name: install gcc
           command: |
+            apt-get update
             apt-get -y install binutils binutils-common binutils-x86-64-linux-gnu cpp cpp-8 gcc-8 libasan5 libatomic1 libbinutils libc-dev-bin libc6-dev libcc1-0 libgcc-8-dev libgomp1 libisl19 libitm1 liblsan0 libmpc3 libmpfr6 libmpx2 libquadmath0 libtsan0 libubsan1 linux-libc-dev manpages manpages-dev gcc
       - run:
           name: install dependencies
