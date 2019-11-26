@@ -29,11 +29,9 @@ jobs:
       - run:
           name: install gcc
           command: |
-            apt install build-essential
-            apt-get install manpages-dev
-          
+            apt install gcc
 
-      - run:
+      - run1:
           name: install dependencies
           command: |
             python3 -m venv venv
