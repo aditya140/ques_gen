@@ -21,7 +21,6 @@ certifi==2018.11.29
 cffi==1.11.5
 chardet==3.0.4
 Click==7.0
-cloudpickle==0.6.1
 clyent==1.2.2
 colorama==0.4.1
 conda==4.5.12
