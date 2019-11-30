@@ -34,7 +34,7 @@ class Teacher:
 
 
 class Greedy:
-    def __init__(self, maxlen=80, sos_index=2, use_stop=False):
+    def __init__(self, maxlen=20, sos_index=2, use_stop=False):
         self.maxlen = maxlen
         self.sos_index = sos_index
         self.use_stop = use_stop

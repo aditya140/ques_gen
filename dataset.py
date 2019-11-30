@@ -35,26 +35,6 @@ class QGenDataset(object):
         for i in self.ans_que:
             self.ans.append(i[0])
             self.que.append(i[1])
-
-    # def _split(self,train=70, test=15, val=15):
-    #     self.ans_train=self.ans[0:int((len(self.ans)*train)/100)]
-    #     self.ans_train=self.ans[int((len(self.ans)*train)/100):int((len(self.ans)*test)/100)]
-    #     self.ans_train=self.ans[int((len(self.ans)*test)/100):int((len(self.ans)*(100-train-test))/100)]
-        
-    #     self.que_train=self.que[0:int((len(self.que)*train)/100)]
-    #     self.que_train=self.que[int((len(self.que)*train)/100):int((len(self.que)*test)/100)]
-    #     self.que_train=self.que[int((len(self.que)*test)/100):int((len(self.que)*(100-train-test))/100)]
-
-    #     for i in range(len(self.ans_train)):
-    #         self.ans_que_train.append([self.ans_train[0],self.ans_train[1]])
-        
-    #     for i in range(len(self.ans_test)):
-    #         self.ans_que_test.append([self.ans_test[0],self.ans_test[1]])
-        
-    #     for i in range(len(self.ans_val)):
-    #         self.ans_que_val.append([self.ans_val[0],self.ans_val[1]])
-
-    #     return self.ans_que_train,self.ans_que_test,self.ans_que_val
         
     def to_csv(self):
         raw_data = {'ans' : [line for line in self.ans], 'que': [line for line in self.que]}
@@ -100,7 +80,7 @@ class QGenDataset(object):
                 for qa in para["qas"]:
                     try:
                         res=[]
-                        if not normalize:
+                        if normalize:
                             res.append(self._normalize(self._get_sentence(para["context"],qa["answers"][0]["answer_start"],qa["answers"][0]["text"])))
                             res.append(self._normalize(qa["question"]))
                         else:
@@ -142,14 +122,13 @@ def load_question_dataset(batch_size, device=0):
     def tokenize_en(text):
         return [tok.text for tok in spacy_en.tokenizer(text)]
     
-    inp_lang = Field(tokenize=tokenize_en, init_token='<sos>', eos_token='<eos>')
-    opt_lang = Field(tokenize=tokenize_en, init_token='<sos>', eos_token='<eos>')
+    inp_lang = Field(tokenize=tokenize_en, init_token='<sos>', eos_token='<eos>',unk_token='<unk>')
+    opt_lang = Field(tokenize=tokenize_en, init_token='<sos>', eos_token='<eos>',unk_token='<unk>')
 
     dataset=QGenDataset()
     dataset._fetch_data(normalize=True)
     dataset.to_csv()
 
-    # associate the text in the 'English' column with the EN_TEXT field, # and 'French' with FR_TEXT
     data_fields = [('ans', inp_lang), ('que', opt_lang)]
     train,val = TabularDataset.splits(path='./.data/', train='train.csv', validation='val.csv', format='csv', fields=data_fields)
 
@@ -160,5 +139,10 @@ def load_question_dataset(batch_size, device=0):
 
     train_iter = BucketIterator(train, batch_size=batch_size, \
             device=device, repeat=False , sort_key=lambda x: len(x.que), shuffle=True)
-    # train_iter, val_iter = BucketIterator((train, val), batch_size=batch_size, device=device, repeat=False , sort_key=lambda x: len(x.que))
-    return train_iter, inp_lang, opt_lang
+    val_iter = BucketIterator(val, batch_size=batch_size, \
+            device=device, repeat=False , sort_key=lambda x: len(x.que), shuffle=True)
+    #train_iter, val_iter = BucketIterator((train, val), batch_size=batch_size, device=device, repeat=False , sort_key=lambda x: len(x.que))
+    inp_lang.vocab.load_vectors('glove.6B.300d')
+    opt_lang.vocab.load_vectors('glove.6B.300d')
+    
+    return train_iter, val_iter, inp_lang, opt_lang

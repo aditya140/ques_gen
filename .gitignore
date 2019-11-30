@@ -12,3 +12,4 @@
 .data/train.csv
 .data/train.csv
 .data/val.csv
+.vector_cache/*
