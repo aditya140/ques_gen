@@ -13,7 +13,6 @@ from tqdm import tqdm
 import hyperparams as hp
 from decoding_helpers import Greedy, Teacher
 
-
 def sequence_to_text(sequence, field):
     return " ".join([field.vocab.itos[int(i)] for i in sequence])
 
