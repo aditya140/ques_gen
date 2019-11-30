@@ -13,9 +13,6 @@ from tqdm import tqdm
 import hyperparams as hp
 from decoding_helpers import Greedy, Teacher
 
-if !hp.tqdm:
-    tqdm.disable
-
 
 def sequence_to_text(sequence, field):
     return " ".join([field.vocab.itos[int(i)] for i in sequence])
@@ -61,8 +58,8 @@ def train(model, optimizer, scheduler, train_iter, val_iter,
     model.train()
     writer = SummaryWriter()
     teacher = Teacher(teacher_forcing_ratio)
-    for _ in tqdm(range(num_epochs), total=num_epochs, unit=' epochs'):
-        pbar = tqdm(train_iter, total=len(train_iter), unit=' batches')
+    for _ in tqdm(range(num_epochs), total=num_epochs, unit=' epochs',disable = hp.tqdm):
+        pbar = tqdm(train_iter, total=len(train_iter), unit=' batches',disable = hp.tqdm)
         for b, batch in enumerate(pbar):
             optimizer.zero_grad()
             teacher.set_targets(batch.que)
