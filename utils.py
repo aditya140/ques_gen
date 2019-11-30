@@ -9,6 +9,9 @@ from PIL import Image
 from tensorboardX import SummaryWriter
 from torch import nn
 from tqdm import tqdm
+import pickle
+from datetime import date
+import dill
 
 import hyperparams as hp
 from decoding_helpers import Greedy, Teacher
@@ -19,6 +22,25 @@ def sequence_to_text(sequence, field):
 
 def text_to_sequence(text, field):
     return [field.vocab.stoi[word] for word in text]
+
+
+def predict(model, sent, fields):
+    model.eval()
+    total_loss = 0
+    greedy = Greedy(use_stop=True)
+    source=text_to_sequence(sent, fields["ans"])
+    outputs, attention = model(sent, greedy)
+    greedy.set_maxlen(hp.max_len)
+    outputs, attention = model(batch.ans, greedy)
+    seq_len, batch_size, vocab_size = outputs.size()
+
+    preds = outputs.topk(1)[1]
+    prediction = sequence_to_text(preds[:, 0].data, fields['que'])
+    attention_plot = show_attention(attention[0],
+                                            prediction, source, return_array=True)
+
+    return prediction
+    
 
 
 def evaluate(model, val_iter, writer, step):
@@ -57,6 +79,16 @@ def train(model, optimizer, scheduler, train_iter, val_iter,
     model.train()
     writer = SummaryWriter()
     teacher = Teacher(teacher_forcing_ratio)
+    fields = val_iter.dataset.fields
+    d1 = date.today().strftime("%d-%m-%Y")
+    run_version=np.random.randint(low=10000, high=99999)
+    
+    with open(f'models/fields/fields_{d1}_{run_version}.pkl', 'wb')as f:
+         dill.dump(fields,f)
+    
+    #pickle not working
+#     with open(f'models/fields/fields_{d1}_{run_version}.pkl', 'wb') as output:
+#         pickle.dump(fields,output)
     for _ in tqdm(range(num_epochs), total=num_epochs, unit=' epochs',disable = hp.tqdm):
         pbar = tqdm(train_iter, total=len(train_iter), unit=' batches',disable = hp.tqdm)
         for b, batch in enumerate(pbar):
@@ -77,7 +109,9 @@ def train(model, optimizer, scheduler, train_iter, val_iter,
             writer.add_scalar('loss', loss.item(), step)
             writer.add_scalar('lr', scheduler.lr, step)
             step += 1
+            
         torch.save(model.state_dict(), f'checkpoints/seq2seq_{step}.pt')
+        torch.save(model, f'models/model/seq2seq_{d1}_{run_version}.pt')
         evaluate(model, val_iter, writer, step)
         model.train()
 

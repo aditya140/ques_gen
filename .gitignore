@@ -13,3 +13,6 @@
 .data/train.csv
 .data/val.csv
 .vector_cache/*
+models/*
+checkpoints/*
+runs/*
