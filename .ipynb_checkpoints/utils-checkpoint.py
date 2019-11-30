@@ -13,6 +13,9 @@ from tqdm import tqdm
 import hyperparams as hp
 from decoding_helpers import Greedy, Teacher
 
+if !hp.tqdm:
+    tqdm.disable
+
 
 def sequence_to_text(sequence, field):
     return " ".join([field.vocab.itos[int(i)] for i in sequence])
@@ -46,7 +49,7 @@ def evaluate(model, val_iter, writer, step):
             attention_plot = show_attention(attention[0],
                                             prediction, source, return_array=True)
 
-            writer.add_figure('Attention', attention_plot, step)
+            #writer.add_figure('Attention', attention_plot, step)
             writer.add_text('Source: ', source, step)
             writer.add_text('Prediction: ', prediction, step)
             writer.add_text('Target: ', target, step)

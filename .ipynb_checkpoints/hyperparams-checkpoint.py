@@ -26,3 +26,6 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 #dataset
 dataset=["squad"]#datatset=["squad","marco"]
+
+#tqdm (on/off)
+tqdm=False
