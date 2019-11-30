@@ -13,7 +13,7 @@ from tqdm import tqdm
 import hyperparams as hp
 from decoding_helpers import Greedy, Teacher
 
-if !hp.tqdm:
+if not hp.tqdm:
     tqdm.disable
 
 
