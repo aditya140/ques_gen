@@ -27,17 +27,20 @@ def text_to_sequence(text, field):
 def predict(model, sent, fields):
     model.eval()
     total_loss = 0
-    greedy = Greedy(use_stop=True)
-    source=text_to_sequence(sent, fields["ans"])
-    outputs, attention = model(sent, greedy)
+    greedy = Greedy()
+    source=[text_to_sequence(sent, fields["ans"])]
+    source = torch.LongTensor(source)
+    print(source)
+    source=source.to(hp.device)
     greedy.set_maxlen(hp.max_len)
-    outputs, attention = model(batch.ans, greedy)
+    outputs, attention = model(source, greedy)
+    
     seq_len, batch_size, vocab_size = outputs.size()
 
     preds = outputs.topk(1)[1]
     prediction = sequence_to_text(preds[:, 0].data, fields['que'])
     attention_plot = show_attention(attention[0],
-                                            prediction, source, return_array=True)
+                                            prediction, sent, return_array=True)
 
     return prediction
     

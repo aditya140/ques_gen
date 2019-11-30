@@ -48,6 +48,7 @@ class Greedy:
         target_vocab_size = decoder.target_vocab_size
 
         if self.use_stop:
+            print(batch_size)
             assert batch_size == 1, 'use_stop does not support batching, set batch size to 1'
 
         outputs = Variable(encoder_out.data.new(self.maxlen, batch_size, target_vocab_size))

@@ -40,5 +40,6 @@ def load_model(latest=True,name=None):
 class QuestionPredictor(object):
     def __init__(self,model=None,latest=True):
         self.model,self.fields=load_model(latest=latest,name=model)
-    def predict(sent):
+        self.model.to(hp.device)
+    def predict(self,sent):
         return utils.predict(model=self.model,sent=sent,fields=self.fields)
