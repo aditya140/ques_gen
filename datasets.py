@@ -62,8 +62,8 @@ class QGenDataset(object):
         df = pd.DataFrame(raw_data, columns=["ans", "que"])
         # remove very long sentences and sentences where translations are 
         # not of roughly equal length
-        df['ans_len'] = df['ans'].str.count(' ')
-        df['que_len'] = df['que'].str.count(' ')
+        df['ans_len'] = df['ans'].astype(str).str.count(' ')
+        df['que_len'] = df['que'].astype(str).str.count(' ')
         df = df.query('ans_len < 80 & que_len < 80')
         df = df.drop_duplicates()
         print("Dataframe size:",df.shape)
