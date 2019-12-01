@@ -30,7 +30,6 @@ def predict(model, sent, fields):
     greedy = Greedy()
     source=[text_to_sequence(sent, fields["ans"])]
     source = torch.LongTensor(source)
-    print(source)
     source=source.to(hp.device)
     greedy.set_maxlen(hp.max_len)
     outputs, attention = model(source, greedy)
@@ -39,8 +38,7 @@ def predict(model, sent, fields):
 
     preds = outputs.topk(1)[1]
     prediction = sequence_to_text(preds[:, 0].data, fields['que'])
-    attention_plot = show_attention(attention[0],
-                                            prediction, sent, return_array=True)
+    #attention_plot = show_attention(attention[0],prediction, sent, return_array=True)
 
     return prediction
     

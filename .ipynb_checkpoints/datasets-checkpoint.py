@@ -64,7 +64,7 @@ class QGenDataset(object):
         # not of roughly equal length
         df['ans_len'] = df['ans'].astype(str).str.count(' ')
         df['que_len'] = df['que'].astype(str).str.count(' ')
-        df = df.query('ans_len < 80 & que_len < 80')
+        df = df.query(f'ans_len < {hp.max_len} & que_len < {hp.max_len}')
         df = df.drop_duplicates()
         print("Dataframe size:",df.shape)
         train, TEST = train_test_split(df, test_size=0.3)
@@ -153,7 +153,6 @@ def load_question_dataset(batch_size,dataset,device=0):
 
     dataset=QGenDataset(dataset)
     
-    # associate the text in the 'English' column with the EN_TEXT field, # and 'French' with FR_TEXT
     data_fields = [('ans', inp_lang), ('que', opt_lang)]
     train,val,test= TabularDataset.splits(path='./.data/', train='train.csv', validation='val.csv',test= "test.csv", format='csv', fields=data_fields)
 
@@ -164,7 +163,7 @@ def load_question_dataset(batch_size,dataset,device=0):
             device=device, repeat=False , sort_key=lambda x: len(x.que), shuffle=True)
     val_iter = BucketIterator(val, batch_size=batch_size, \
             device=device, sort_key=lambda x: len(x.que), shuffle=True)
-    test_iter = BucketIterator(test, batch_size=batch_size, \
+    test_iter = BucketIterator(test, batch_size=1, \
             device=device, sort_key=lambda x: len(x.que), shuffle=True)
     
     if hp.embedding!=None:
@@ -173,3 +172,30 @@ def load_question_dataset(batch_size,dataset,device=0):
         opt_lang.vocab.load_vectors(hp.embedding)
 
     return train_iter, val_iter,test_iter, inp_lang, opt_lang
+
+
+def load_question_dataset_test_iter(dataset,device=0):
+    spacy_en = spacy.load('en')
+
+    def tokenize_en(text):
+        return [tok.text for tok in spacy_en.tokenizer(text)]
+    
+    inp_lang = Field(tokenize=tokenize_en, init_token='<sos>', eos_token='<eos>')
+    opt_lang = Field(tokenize=tokenize_en, init_token='<sos>', eos_token='<eos>')
+
+    
+    data_fields = [('ans', inp_lang), ('que', opt_lang)]
+    train,val,test= TabularDataset.splits(path='./.data/', train='train.csv', validation='val.csv',test= "test.csv", format='csv', fields=data_fields)
+
+    inp_lang.build_vocab(train,val,test)
+    opt_lang.build_vocab(train,val,test)
+
+    test_iter = BucketIterator(test, batch_size=1, \
+            device=device, sort_key=lambda x: len(x.que), shuffle=True)
+    
+    if hp.embedding!=None:
+        print("Loading pretrained embeddings")
+        inp_lang.vocab.load_vectors(hp.embedding)
+        opt_lang.vocab.load_vectors(hp.embedding)
+
+    return test_iter

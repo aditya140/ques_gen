@@ -16,3 +16,4 @@
 models/*
 checkpoints/*
 runs/*
+eval_results.csv

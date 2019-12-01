@@ -6,6 +6,19 @@ import pickle
 import utils
 import dill
 import torch
+import unicodedata
+
+
+def unicodeToAscii(s):
+        return ''.join(
+        c for c in unicodedata.normalize('NFD', s)
+        if unicodedata.category(c) != 'Mn'
+    )
+    
+def _normalize(s):
+    s = unicodeToAscii(s.lower().strip())
+    s = re.sub(r"([.!?])", r" \1", s)
+    return s
 
 def load_model(latest=True,name=None):
     if name==None:
@@ -24,7 +37,7 @@ def load_model(latest=True,name=None):
             return model,fields
         print("Please specify correct arguments")
     else:
-        pattern=re.compile("seq2seq([0-9\-]*)_(\d*).pt")
+        pattern=re.compile("seq2seq_([0-9\-]*)_(\d*).pt")
         date_version=re.findall(pattern,name)
         field_path=f"./models/fields/fields_{date_version[0][0]}_{date_version[0][1]}.pkl"
         with open(field_path,'rb')as f:
@@ -34,12 +47,10 @@ def load_model(latest=True,name=None):
         model_path=f"./models/model/seq2seq_{date_version[0][0]}_{date_version[0][1]}.pt"
         model = torch.load(model_path)
         return model,fields
-
-
         
 class QuestionPredictor(object):
     def __init__(self,model=None,latest=True):
         self.model,self.fields=load_model(latest=latest,name=model)
         self.model.to(hp.device)
     def predict(self,sent):
-        return utils.predict(model=self.model,sent=sent,fields=self.fields)
+        return utils.predict(model=self.model,sent=_normalize(sent),fields=self.fields)
