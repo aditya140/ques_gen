@@ -12,6 +12,7 @@ from tqdm import tqdm
 import pickle
 from datetime import date
 import dill
+from beam import BeamHelper
 
 import hyperparams as hp
 from decoding_helpers import Greedy, Teacher
@@ -22,6 +23,20 @@ def sequence_to_text(sequence, field):
 
 def text_to_sequence(text, field):
     return [field.vocab.stoi[word] for word in text]
+
+def predict_beam(model,sent,fields,beam_size):
+    source=([fields['ans'].vocab.stoi[fields['ans'].init_token]]+text_to_sequence(fields['ans'].preprocess(sent),fields['ans'])+[fields['ans'].vocab.stoi[fields['ans'].eos_token]])
+    source=[[i] for i in source]
+    source=torch.LongTensor(source)
+
+    model.eval()
+    total_loss = 0
+    beam = BeamHelper(beam_size=beam_size, maxlen=hp.max_len)
+    source=source.to(hp.device)
+    best_score, best_seq = model(source, beam)
+    #preds = outputs.topk(1)[1]
+    prediction = sequence_to_text(best_seq, fields['que'])
+    return prediction
 
 
 def predict(model, sent, fields):

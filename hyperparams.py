@@ -10,7 +10,7 @@ embed_dim = 300
 n_layers = 2
 dropout = 0.3
 batch_size = 32
-num_epochs = 1
+num_epochs = 30
 embedding="glove.6B.300d"
 
 # training

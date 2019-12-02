@@ -52,5 +52,7 @@ class QuestionPredictor(object):
     def __init__(self,model=None,latest=True):
         self.model,self.fields=load_model(latest=latest,name=model)
         self.model.to(hp.device)
-    def predict(self,sent):
+    def predict(self,sent,beam=False,beam_size=3):
+        if beam:
+            return utils.predict_beam(model=self.model,sent=_normalize(sent),fields=self.fields,beam_size=beam_size)
         return utils.predict(model=self.model,sent=_normalize(sent),fields=self.fields)
