@@ -13,6 +13,6 @@ open the ```Nlp.ipynb``` file in the repo on Google Colab
 2. Run ```bash setup.sh```
 3. Adjust the hyper parameters as required in ```hyparameteres.txt``` file.
 4. Run ```python train.py```
-5. [optional] launch tensorboard in directory ./runs to monitor training
+5. [optional] ```tensorboard --logdir runs``` to monitor training
 6. run ``` python eval_metrics.py``` to evalutate metrics (saved as ```metrics.txt```)
 7. The output of the test dataset will be saved as ```eval_results.csv```
